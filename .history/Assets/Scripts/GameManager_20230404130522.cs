@@ -1,0 +1,104 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System.Threading.Tasks;
+
+public class GameManager : MonoBehaviour
+{
+    [SerializeField] GameObject enemyShooter;
+    [SerializeField] GameObject enemyShooterElite;
+
+    private List<GameObject> enemyWave = new List<GameObject>();
+    private int waveNum = 0;
+    private float waveTimer = 0f;
+    private float waveInterval = 2f;
+    private bool waveEndFlag = false; 
+    public static Task halfSecond = Task.Run(async delegate {await Task.Delay(500);});
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+        waveEndFlag = true;
+        foreach (GameObject enemy in enemyWave)
+        {
+            if (enemy)
+            {
+                waveEndFlag = false;
+            }
+        }
+
+        if (waveEndFlag) {waveTimer += Time.deltaTime;}
+
+        if (waveTimer > waveInterval) 
+        {
+            waveTimer = 0f;
+            enemyWave = new List<GameObject>();
+            waveNum ++;
+            Debug.Log(waveNum);
+
+            if (waveNum % 5 == 1)
+            {
+                Task.Run(async delegate
+                {
+                    await AddDelayExample();
+                }).Wait();
+                Spawn(enemyShooter, new Vector2(1.5f, 5.5f));
+                Spawn(enemyShooter, new Vector2(-1.5f, 5.5f));
+            }
+            else if (waveNum % 5 == 2)
+            {
+                Spawn(enemyShooterElite, new Vector2(0f, 5.5f));
+            }
+            else if (waveNum % 5 == 3)
+            {
+                Spawn(enemyShooter, new Vector2(1.5f, 5.5f));
+                Spawn(enemyShooter, new Vector2(0f, 6f), 0.5f);
+                Spawn(enemyShooter, new Vector2(1.5f, 5.5f));
+                
+            }
+            else if (waveNum % 5 == 4)
+            {
+                Spawn(enemyShooterElite, new Vector2(1.5f, 5.5f));
+                Spawn(enemyShooterElite, new Vector2(-1.5f, 5.5f));
+            }
+            else if (waveNum % 5 == 0)
+            {
+                Spawn(enemyShooterElite, new Vector2(1f, 6f), 3f);
+                Spawn(enemyShooterElite, new Vector2(-1f, 6f), 3f);
+                Spawn(enemyShooter, new Vector2(1.6f, 5.5f));
+                Spawn(enemyShooter, new Vector2(-1.6f, 5.5f));
+            }
+            
+        }
+
+
+    }
+
+
+    private async void Spawn2(GameObject enemy, Vector2 position, bool delay = false)
+    {
+        if (delay)
+        {
+            halfSecond.Wait();
+        }
+        GameObject spawnedEnemy = Instantiate(enemy, new Vector3(position[0], position[1], 0f), Quaternion.identity);
+        this.enemyWave.Add(spawnedEnemy);
+    }
+    private IEnumerator Spawn(GameObject enemy, Vector2 position, float delayTime = 0f)
+    {
+        Debug.Log(0);
+        yield return new WaitForSeconds(delayTime);
+        GameObject spawnedEnemy = Instantiate(enemy, new Vector3(position[0], position[1], 0f), Quaternion.identity);
+        this.enemyWave.Add(spawnedEnemy);
+        Debug.Log(1);
+
+    }
+
+}
