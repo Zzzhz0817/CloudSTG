@@ -160,6 +160,7 @@ void Update()
     if (zhenActiveFlag && Input.touchCount == 1)
     {
         isPaused = false;
+        pauseMenu.ResumeGame();
         zhenUI.SetActive(false);
         Time.timeScale = 1f;
         zhenActiveFlag = false;
@@ -174,7 +175,6 @@ void Update()
 
     if (!isPaused) 
     {
-        // *** MOVE THIS BLOCK BACK TO THE TOP LEVEL ***
         if (Input.touchCount == 1)
         {
             Vector2 world_pos = ScreenToWorld(Input.GetTouch(0).position);
@@ -529,7 +529,7 @@ void Update()
     public void GameResume()
     {
         isPaused = false;
-        pauseUI.SetActive(false);
+        pauseMenu.ResumeGame();
         Time.timeScale = 1f;
     }
 
@@ -537,6 +537,7 @@ void Update()
     {
         Debug.Log("Link Start!");
         isPaused = false;
+        pauseMenu.ResumeGame();
         startUI.SetActive(false);
         pauseUI.SetActive(false);
         Time.timeScale = 1f;
