@@ -44,7 +44,7 @@ public class PauseMenuBackground : MonoBehaviour
         float scaleFactor = pauseUI.GetComponentInParent<CanvasScaler>().scaleFactor;
 
         // Debug.Log("Coroutine started");
-        // Vector2 viewportPos = Camera.main.WorldToViewportPoint(player.transform.position);
+        Vector2 viewportPos = Camera.main.WorldToViewportPoint(player.transform.position);
         // Debug.Log("Viewport Position: " + viewportPos);
 
         // Adjust screenPos by the scale factor
