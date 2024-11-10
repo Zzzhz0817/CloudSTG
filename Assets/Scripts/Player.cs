@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 public class Player : MonoBehaviour
 {
     [SerializeField] GameObject pauseUI;
+    [SerializeField] PauseMenuBackground pauseMenu;
     [SerializeField] GameObject zhenUI;
     [SerializeField] GameObject startUI;
     [SerializeField] GameObject defultProjectile;
@@ -112,137 +113,137 @@ public class Player : MonoBehaviour
         
     }
 
-    void Update()
+void Update()
+{
+    invincibleTimer += Time.deltaTime;
+    zhenCooldownTimer += Time.deltaTime;
+    
+    if (zhenCooldownTimer > zhenCooldownTime)
     {
-        invincibleTimer += Time.deltaTime;
-        zhenCooldownTimer += Time.deltaTime;
-       
+        zhenChargeEffect.SetActive(true);
+    }
+    else
+    {
+        zhenChargeEffect.SetActive(false);
+    }
+
+    if (health <= 0)
+    {
+        Die();
+    }
+
+    if (Input.touchCount == 0 && !isPaused) // Only pause if not already paused
+    {
         if (zhenCooldownTimer > zhenCooldownTime)
         {
-            zhenChargeEffect.SetActive(true);
+            isPaused = true;
+            pauseMenu.PauseGame();
+            zhenUI.SetActive(true);
+            Time.timeScale = 0f;
+            zhenActiveFlag = true;
         }
         else
         {
-            zhenChargeEffect.SetActive(false);
-        }
+            isPaused = true;
+            pauseMenu.PauseGame();
 
-        if (health <= 0)
-        {
-            Die();
-        }
-
-        if (Input.touchCount == 0)
-        {
-            if (zhenCooldownTimer > zhenCooldownTime)
+            if (!pauseUI.activeSelf)
             {
-                isPaused = true;
-                zhenUI.SetActive(true);
-                Time.timeScale = 0f;
-                zhenActiveFlag = true;
+                SaveByPlayerPrefs();
             }
-            else
+
+            pauseUI.SetActive(true);
+            Time.timeScale = 0f;
+        }
+    }
+
+    if (zhenActiveFlag && Input.touchCount == 1)
+    {
+        isPaused = false;
+        zhenUI.SetActive(false);
+        Time.timeScale = 1f;
+        zhenActiveFlag = false;
+        zhenCooldownTimer = 0f;
+
+        Vector2 world_pos = ScreenToWorld(Input.GetTouch(0).position);
+        var effectAngle = Mathf.Atan2(world_pos[0]-transform.position[0], world_pos[1]-transform.position[1]);
+        effectAngle = -180 * effectAngle / Mathf.PI;
+        var zhenEffect = Instantiate(zhenActivateEffect, (transform.position + new Vector3(world_pos.x, world_pos.y, 0f))/2f, Quaternion.Euler(0f,0f,effectAngle));
+        zhenEffect.transform.localScale = new Vector3(zhenEffect.transform.localScale.x, zhenEffect.transform.localScale.y*(transform.position - new Vector3(world_pos.x, world_pos.y, 0f)).magnitude*0.3f, zhenEffect.transform.localScale.z);
+    }
+
+    if (!isPaused) 
+    {
+        // *** MOVE THIS BLOCK BACK TO THE TOP LEVEL ***
+        if (Input.touchCount == 1)
+        {
+            Vector2 world_pos = ScreenToWorld(Input.GetTouch(0).position);
+            transform.position = world_pos;
+            transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            orientationVector = new Vector2(0, 1);
+            orientationAngle = 90;
+            if (guaDict["Xun"] > 0)
             {
-                isPaused = true;
-
-                if (!pauseUI.activeSelf)
+                if (!xunOneFingerFlag)
                 {
-                    SaveByPlayerPrefs();
+                    var effectAngle = Mathf.Atan2(transform.position[0]-xunPosBuffer[0], transform.position[1]-xunPosBuffer[1]);
+                    effectAngle = -180 * effectAngle / Mathf.PI;
+                    xunOneFingerFlag = true;
+                    var xunWindEffect = Instantiate(xunEffect, (transform.position + xunPosBuffer)/2f, Quaternion.Euler(0f,0f,effectAngle));
+                    xunWindEffect.transform.localScale = new Vector3(xunWindEffect.transform.localScale.x *(transform.position - xunPosBuffer).magnitude, xunWindEffect.transform.localScale.y, xunWindEffect.transform.localScale.z);
                 }
-
-                pauseUI.SetActive(true);
-                Time.timeScale = 0f;
+                xunPosBuffer = transform.position;
             }
             
         }
-
-        if (zhenActiveFlag && Input.touchCount == 1)
-        {
-            isPaused = false;
-            zhenUI.SetActive(false);
-            Time.timeScale = 1f;
-            zhenActiveFlag = false;
-            zhenCooldownTimer = 0f;
-
-            Vector2 world_pos = ScreenToWorld(Input.GetTouch(0).position);
-            var effectAngle = Mathf.Atan2(world_pos[0]-transform.position[0], world_pos[1]-transform.position[1]);
-            effectAngle = -180 * effectAngle / Mathf.PI;
-            var zhenEffect = Instantiate(zhenActivateEffect, (transform.position + new Vector3(world_pos.x, world_pos.y, 0f))/2f, Quaternion.Euler(0f,0f,effectAngle));
-            zhenEffect.transform.localScale = new Vector3(zhenEffect.transform.localScale.x, zhenEffect.transform.localScale.y*(transform.position - new Vector3(world_pos.x, world_pos.y, 0f)).magnitude*0.3f, zhenEffect.transform.localScale.z);
-        }
-
-        if (!isPaused)
-        {
-            if (Input.touchCount == 1)
+        else if (Input.touchCount == 2)
+        {   
+            Vector2 world_pos0, world_pos1;
+            if (Input.GetTouch(0).position[0] < Input.GetTouch(1).position[0])
             {
-                Vector2 world_pos = ScreenToWorld(Input.GetTouch(0).position);
-                transform.position = world_pos;
-                transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-                orientationVector = new Vector2(0, 1);
-                orientationAngle = 90;
-                if (guaDict["Xun"] > 0)
-                {
-                    if (!xunOneFingerFlag)
-                    {
-                        var effectAngle = Mathf.Atan2(transform.position[0]-xunPosBuffer[0], transform.position[1]-xunPosBuffer[1]);
-                        effectAngle = -180 * effectAngle / Mathf.PI;
-                        xunOneFingerFlag = true;
-                        var xunWindEffect = Instantiate(xunEffect, (transform.position + xunPosBuffer)/2f, Quaternion.Euler(0f,0f,effectAngle));
-                        xunWindEffect.transform.localScale = new Vector3(xunWindEffect.transform.localScale.x *(transform.position - xunPosBuffer).magnitude, xunWindEffect.transform.localScale.y, xunWindEffect.transform.localScale.z);
-                    }
-                    xunPosBuffer = transform.position;
-                }
-                
+                world_pos0 = ScreenToWorld(Input.GetTouch(0).position);
+                world_pos1 = ScreenToWorld(Input.GetTouch(1).position);
             }
-            else if (Input.touchCount == 2)
-            {   
-                Vector2 world_pos0, world_pos1;
-                if (Input.GetTouch(0).position[0] < Input.GetTouch(1).position[0])
-                {
-                    world_pos0 = ScreenToWorld(Input.GetTouch(0).position);
-                    world_pos1 = ScreenToWorld(Input.GetTouch(1).position);
-                }
-                else
-                {
-                    world_pos1 = ScreenToWorld(Input.GetTouch(0).position);
-                    world_pos0 = ScreenToWorld(Input.GetTouch(1).position);
-                }
-
-                Vector2 world_pos = (world_pos0 + world_pos1) / 2;
-                
-                orientationAngle = Mathf.Atan2(world_pos0[0]-world_pos1[0], world_pos0[1]-world_pos1[1]);
-                orientationAngle = -180 * orientationAngle / Mathf.PI;
-
-                transform.position = world_pos;
-                transform.rotation = Quaternion.Euler(0f, 0f, orientationAngle - 90f);
-
-                orientationVector = new Vector2(Mathf.Tan(Mathf.PI * (orientationAngle + 90) / -180), 1);
-                orientationVector.Normalize();
-
-                if (guaDict["Xun"] > 0)
-                {
-                    if (xunOneFingerFlag)
-                    {
-                        var effectAngle = Mathf.Atan2(transform.position[0]-xunPosBuffer[0], transform.position[1]-xunPosBuffer[1]);
-                        effectAngle = -180 * effectAngle / Mathf.PI;
-                        xunOneFingerFlag = false;
-                        var xunWindEffect = Instantiate(xunEffect, (transform.position + xunPosBuffer)/2f, Quaternion.Euler(0f,0f,effectAngle));
-                        xunWindEffect.transform.localScale = new Vector3(xunWindEffect.transform.localScale.x *(transform.position - xunPosBuffer).magnitude, xunWindEffect.transform.localScale.y, xunWindEffect.transform.localScale.z);
-                    }
-                    xunPosBuffer = transform.position;
-                }
-
-                
+            else
+            {
+                world_pos1 = ScreenToWorld(Input.GetTouch(0).position);
+                world_pos0 = ScreenToWorld(Input.GetTouch(1).position);
             }
-        }
-    
-        shotTimer += Time.deltaTime;
 
-        if(shotTimer >= shotInterval)
-        {
-            Launch();
-            shotTimer = 0f;
+            Vector2 world_pos = (world_pos0 + world_pos1) / 2;
+            
+            orientationAngle = Mathf.Atan2(world_pos0[0]-world_pos1[0], world_pos0[1]-world_pos1[1]);
+            orientationAngle = -180 * orientationAngle / Mathf.PI;
+
+            transform.position = world_pos;
+            transform.rotation = Quaternion.Euler(0f, 0f, orientationAngle - 90f);
+
+            orientationVector = new Vector2(Mathf.Tan(Mathf.PI * (orientationAngle + 90) / -180), 1);
+            orientationVector.Normalize();
+
+            if (guaDict["Xun"] > 0)
+            {
+                if (xunOneFingerFlag)
+                {
+                    var effectAngle = Mathf.Atan2(transform.position[0]-xunPosBuffer[0], transform.position[1]-xunPosBuffer[1]);
+                    effectAngle = -180 * effectAngle / Mathf.PI;
+                    xunOneFingerFlag = false;
+                    var xunWindEffect = Instantiate(xunEffect, (transform.position + xunPosBuffer)/2f, Quaternion.Euler(0f,0f,effectAngle));
+                    xunWindEffect.transform.localScale = new Vector3(xunWindEffect.transform.localScale.x *(transform.position - xunPosBuffer).magnitude, xunWindEffect.transform.localScale.y, xunWindEffect.transform.localScale.z);
+                }
+                xunPosBuffer = transform.position;
+            }
         }
     }
+    
+    shotTimer += Time.deltaTime;
+
+    if(shotTimer >= shotInterval)
+    {
+        Launch();
+        shotTimer = 0f;
+    }
+}
 
     private Vector2 ScreenToWorld(Vector2 screen_pos)
     {   
