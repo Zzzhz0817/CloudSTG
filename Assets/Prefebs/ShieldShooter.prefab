@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8535346777944447184}
   m_Layer: 0
   m_Name: ShieldShooter
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -280,6 +280,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4696347608851652830}
     m_Modifications:
+    - target: {fileID: 420155110753540855, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
+      propertyPath: m_Size.x
+      value: 18.055153
+      objectReference: {fileID: 0}
+    - target: {fileID: 420155110753540855, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
+      propertyPath: m_Size.y
+      value: 6.2057667
+      objectReference: {fileID: 0}
+    - target: {fileID: 420155110753540855, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
+      propertyPath: m_Offset.x
+      value: -0.123746395
+      objectReference: {fileID: 0}
+    - target: {fileID: 420155110753540855, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.62800694
+      objectReference: {fileID: 0}
     - target: {fileID: 2172176636472420385, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
       propertyPath: m_Name
       value: Shield
@@ -306,7 +322,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8423785517035795767, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -25.3
+      value: -50
       objectReference: {fileID: 0}
     - target: {fileID: 8423785517035795767, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
       propertyPath: m_LocalPosition.z

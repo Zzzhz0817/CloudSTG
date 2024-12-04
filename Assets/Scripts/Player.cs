@@ -357,7 +357,7 @@ void Update()
 
             await Task.Run(() =>
             {
-                Task.Delay(50).Wait();
+                Task.Delay(30).Wait();
             });
         }
     }
@@ -367,8 +367,8 @@ void Update()
         qi += 1;
         if (qi >= MAX_QI)
         {
-            Instantiate(yinYao, new Vector3(-0.5f, 4f, 0f), Quaternion.identity);
-            Instantiate(yangYao, new Vector3(0.5f, 4f, 0f), Quaternion.identity);
+            Instantiate(yinYao, new Vector3(-1f, 4f, 0f), Quaternion.identity);
+            Instantiate(yangYao, new Vector3(1f, 4f, 0f), Quaternion.identity);
             qi = 0;
         }
         neckRenderer.sprite = necks[(int)Mathf.Floor((float)qi)];
@@ -378,11 +378,30 @@ void Update()
     {
         GameObject[] oppositeYaos;
         oppositeYaos = GameObject.FindGameObjectsWithTag(isYang ? "YinYao" : "YangYao");
-        foreach(GameObject yao in oppositeYaos)
+
+        if (oppositeYaos.Length > 0)
         {
-            Instantiate(yaoDieEffect, yao.transform.position, Quaternion.identity);
-            Destroy(yao);
+            // Initialize variables to find the Yao with the lowest Y position
+            GameObject lowestYao = oppositeYaos[0];
+            float lowestY = lowestYao.transform.position.y;
+
+            // Iterate through the Yaos to find the one with the lowest Y position
+            foreach (GameObject yao in oppositeYaos)
+            {
+                if (yao.transform.position.y < lowestY)
+                {
+                    lowestYao = yao;
+                    lowestY = yao.transform.position.y;
+                }
+            }
+
+            // Instantiate the die effect at the position of the lowest Yao
+            Instantiate(yaoDieEffect, lowestYao.transform.position, Quaternion.identity);
+
+            // Destroy the lowest Yao
+            Destroy(lowestYao);
         }
+
 
         yaoList.Add(isYang);
         
@@ -504,15 +523,16 @@ void Update()
 
     private void Die()
     {
+        isPaused = true;
         PlayerPrefs.DeleteKey("Save");
         LoadFromPlayerPrefs();
         genShield.GetComponent<GenShield>().SetLayer(shield);
         neckRenderer.sprite = necks[(int)Mathf.Floor((float)qi)];
-        headRenderer.sprite = heads[health-1];
+        headRenderer.sprite = heads[health - 1];
 
         if (guaDict["Zhen"] > 0)
         {
-            zhenCooldownTime = 30f * (2f/(1f+guaDict["Zhen"]));
+            zhenCooldownTime = 30f * (2f / (1f + guaDict["Zhen"]));
             if (isHelpThunder)
             {
                 zhenCooldownTime = 0f;
@@ -522,9 +542,44 @@ void Update()
         {
             zhenCooldownTime = 65535f;
         }
-        startUI.SetActive(true);
 
+        // Activate and start fading in the start UI
+        StartCoroutine(FadeInStartUI());
+
+            // Destroy all objects tagged as "Enemy"
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject enemy in enemies)
+        {
+            Destroy(enemy);
+        }
     }
+
+    private IEnumerator FadeInStartUI()
+    {
+        CanvasGroup canvasGroup = startUI.GetComponent<CanvasGroup>();
+
+        // Ensure the CanvasGroup exists
+        if (canvasGroup == null)
+        {
+            canvasGroup = startUI.AddComponent<CanvasGroup>();
+        }
+
+        startUI.SetActive(true); // Activate the UI
+        canvasGroup.alpha = 0f;  // Set it fully transparent
+
+        float duration = 3f;     // Duration for the fade-in effect
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            canvasGroup.alpha = Mathf.Clamp01(elapsed / duration); // Gradually increase alpha
+            yield return null; // Wait for the next frame
+        }
+
+        canvasGroup.alpha = 1f; // Ensure it is fully opaque at the end
+    }
+
 
     public void GameResume()
     {

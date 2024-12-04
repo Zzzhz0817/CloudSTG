@@ -275,6 +275,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ShieldShooterElite
       objectReference: {fileID: 0}
+    - target: {fileID: 8196510639111662728, guid: 55828621e82538548be31ec952cb0022, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 55828621e82538548be31ec952cb0022, type: 3}
 --- !u!4 &1632185708007555078 stripped
@@ -289,6 +293,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1632185708007555078}
     m_Modifications:
+    - target: {fileID: 420155110753540855, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
+      propertyPath: m_Size.x
+      value: 18.139248
+      objectReference: {fileID: 0}
+    - target: {fileID: 420155110753540855, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
+      propertyPath: m_Size.y
+      value: 6.1605678
+      objectReference: {fileID: 0}
+    - target: {fileID: 420155110753540855, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
+      propertyPath: m_Offset.x
+      value: -0.12311745
+      objectReference: {fileID: 0}
+    - target: {fileID: 420155110753540855, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.6054075
+      objectReference: {fileID: 0}
     - target: {fileID: 2172176636472420385, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
       propertyPath: m_Name
       value: Shield
@@ -315,7 +335,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8423785517035795767, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -25.4
+      value: -50
       objectReference: {fileID: 0}
     - target: {fileID: 8423785517035795767, guid: 07f5aab0fb376cf45b087f95f6cd45bf, type: 3}
       propertyPath: m_LocalPosition.z

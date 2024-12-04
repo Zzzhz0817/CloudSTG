@@ -6,6 +6,7 @@ TagManager:
   tags:
   - YinYao
   - YangYao
+  - Enemy
   layers:
   - Default
   - TransparentFX

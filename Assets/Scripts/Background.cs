@@ -20,7 +20,7 @@ public class Background : MonoBehaviour
         highCounter++;
         lowCounter++;
         transform.position = transform.position - Time.deltaTime * (new Vector3(0f, 0.3f, 0f));
-        if (Random.Range(0f, 1f) < 0.00005f * lowCounter)
+        if (Random.Range(0f, 10f) < 0.00005f * lowCounter)
         {
             var cloud = Instantiate(clouds[Random.Range(0, 7)], new Vector3(Random.Range(-2f, 2f),8f,0f), Quaternion.identity);
             Destroy(cloud, 5f);

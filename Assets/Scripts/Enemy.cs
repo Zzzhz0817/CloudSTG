@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
     public Transform wayPointCollection;
     [SerializeField] GameObject drop;
     [SerializeField] GameObject dieEffect;
-    public int health = 3;
+    public float health = 3f;
 
     public float shotInterval;
     public int shotNum;
@@ -121,7 +121,7 @@ public class Enemy : MonoBehaviour
 
     public void GetHit(int damage)
     {
-        health -= damage;
+        health -= 0.5f * damage;
     }
 
     public void Die()

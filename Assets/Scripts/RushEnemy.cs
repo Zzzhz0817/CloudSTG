@@ -9,7 +9,7 @@ public class RushEnemy : MonoBehaviour
     [SerializeField] GameObject dieEffect;
     [SerializeField] bool isFacingRight;
     public int health = 3;
-    public float moveSpeed = 8f;
+    public float moveSpeed = 8f; // Maximum move speed
     public float restTime = 5f;
     private float restTimer = 65535f;
     private bool timerFlag;
@@ -17,7 +17,11 @@ public class RushEnemy : MonoBehaviour
     private int wayPointCount = 0;
     private Rigidbody2D rigidbody2d;
     private GameObject player;
-    // Start is called before the first frame update
+
+    private float moveProgress = 0f; // Progress along the movement (0 to 1)
+    private Vector3 startPoint;
+    private Vector3 targetPoint;
+
     void Awake()
     {
         player = GameObject.FindWithTag("Player");
@@ -28,9 +32,12 @@ public class RushEnemy : MonoBehaviour
         {
             wayPointPos.Add(wayPointCollection.GetChild(i).transform.position);
         }
+
+        // Initialize starting and target points
+        startPoint = transform.position;
+        targetPoint = wayPointPos[wayPointCount];
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (health <= 0)
@@ -39,48 +46,62 @@ public class RushEnemy : MonoBehaviour
         }
 
         restTimer += Time.deltaTime;
+
+        // Only move if the rest timer allows it
         if (restTimer > restTime)
         {
-            transform.position = Vector3.MoveTowards(transform.position, wayPointPos[wayPointCount], moveSpeed * Time.deltaTime);
-        }
+            // Increment move progress
+            moveProgress += Time.deltaTime * moveSpeed / Vector3.Distance(startPoint, targetPoint);
 
-        if (transform.position == wayPointPos[wayPointCount])
-        {
-            wayPointCount ++;
-            wayPointCount = wayPointCount % wayPointPos.Count;
-            
-            if (wayPointCount == 1 && timerFlag)
+            // Use a smooth easing function for natural movement
+            float easedProgress = Mathf.SmoothStep(0f, 1f, moveProgress);
+
+            // Update position
+            transform.position = Vector3.Lerp(startPoint, targetPoint, easedProgress);
+
+            // Check if the target point is reached
+            if (moveProgress >= 1f)
             {
-                restTimer = 0f;
-                timerFlag = false;
-            }
-            else if (wayPointCount == 2)
-            {
-                if (isFacingRight)
+                // Move to the next waypoint
+                wayPointCount++;
+                wayPointCount %= wayPointPos.Count;
+
+                // Reset for the next movement
+                startPoint = targetPoint;
+                targetPoint = wayPointPos[wayPointCount];
+                moveProgress = 0f;
+
+                // Handle rest timer and facing direction logic
+                if (wayPointCount == 1 && timerFlag)
                 {
-                    transform.localScale = new Vector3(-0.03f, 0.03f, 0.06f);
+                    restTimer = 0f;
+                    timerFlag = false;
                 }
-                else
+                else if (wayPointCount == 2)
                 {
-                    transform.localScale = new Vector3(0.03f, 0.03f, 0.06f);
+                    if (isFacingRight)
+                    {
+                        transform.localScale = new Vector3(-0.03f, 0.03f, 0.06f);
+                    }
+                    else
+                    {
+                        transform.localScale = new Vector3(0.03f, 0.03f, 0.06f);
+                    }
                 }
-                
-            }
-            else if (wayPointCount == 0)
-            {
-                if (isFacingRight)
+                else if (wayPointCount == 0)
                 {
-                    transform.localScale = new Vector3(0.03f, 0.03f, 0.06f);
+                    if (isFacingRight)
+                    {
+                        transform.localScale = new Vector3(0.03f, 0.03f, 0.06f);
+                    }
+                    else
+                    {
+                        transform.localScale = new Vector3(-0.03f, 0.03f, 0.06f);
+                    }
+                    timerFlag = true;
                 }
-                else
-                {
-                    transform.localScale = new Vector3(-0.03f, 0.03f, 0.06f);
-                }
-                timerFlag = true;
             }
         }
-        
-
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
